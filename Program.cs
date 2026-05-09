@@ -146,7 +146,7 @@ public class Program
             Console.WriteLine("Например, загадано слово \"мерка\". Вы ввели слово \"груша\"");
             Console.Write("Тогда будет выведено: ");
             AnsiConsole.MarkupLine("[black on red]г[/][black on yellow]р[/][black on red]у[/][black on red]ш[/][black on green]а[/]");
-            Thread.Sleep(6500);
+            Console.ReadKey(true);
         }
         Console.WriteLine("Начнем игру...");
         string hiddenWord = words[Random.Shared.Next(0, words.Length - 1)];
