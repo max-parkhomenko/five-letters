@@ -152,6 +152,7 @@ public class Program
         }
         string hiddenWord = words[Random.Shared.Next(0, words.Length - 1)];
         Console.Clear();
+        hiddenWord = "халат";
         byte[] kboard = new byte[32];
         for (int i = 0; i < 6; i++)
         {
@@ -174,50 +175,29 @@ public class Program
                 Console.WriteLine("Требуется ввести русское слово, не содержащее спец. символов!");
                 goto thisTry;
             }
-            Dictionary<char, int> not_single_chars = [];
-            List<char> alreadyUsedChars = [];
+            List<char> alreadyYellowSingularChars = [];
             foreach (char c in word)
             {
                 int iChar = GetKeyboardID(c);
                 int cIndex = word.IndexOf(c);
-                if (hiddenWord[cIndex] == c && !alreadyUsedChars.Contains(c))
+                if (hiddenWord[cIndex] == c)
                 {
                     AnsiConsole.Markup("[black on green]{0}[/]", c);
-                    alreadyUsedChars.Add(c);
                     kboard[iChar] = 1;
                 }
                 else if (hiddenWord.Contains(c))
                 {
-                    if (not_single_chars.ContainsKey(c))
-                    {
-                        if (alreadyUsedChars.Contains(c))
-                        {
-                            AnsiConsole.Markup("[black on red]{0}[/]", c);
-                            kboard[iChar] = 3;
-                        }
-                        else {
-                            AnsiConsole.Markup("[black on yellow]{0}[/]", c);
-                            kboard[iChar] = 2;
-                        }
-                        if (--not_single_chars[c] == 0)
-                        {
-                            not_single_chars.Remove(c);
-                        }
-                        continue;
-                    }
-                    if (alreadyUsedChars.Contains(c))
+                    if (alreadyYellowSingularChars.Contains(c))
                     {
                         AnsiConsole.Markup("[black on red]{0}[/]", c);
                         kboard[iChar] = 3;
+                        continue;
                     }
-                    else {
-                        AnsiConsole.Markup("[black on yellow]{0}[/]", c);
-                        kboard[iChar] = 2;
-                    }
-                    int counts = hiddenWord.Count(ch => ch == c);
-                    if (counts > 1)
+                    AnsiConsole.Markup("[black on yellow]{0}[/]", c);
+                    kboard[iChar] = 2;
+                    if (hiddenWord.Count(ch => ch == c) == 1)
                     {
-                        not_single_chars.Add(c, counts - 1);
+                        alreadyYellowSingularChars.Add(c);
                     }
                 }
                 else
