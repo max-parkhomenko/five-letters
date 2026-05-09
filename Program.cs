@@ -146,9 +146,10 @@ public class Program
             Console.WriteLine("Например, загадано слово \"мерка\". Вы ввели слово \"груша\"");
             Console.Write("Тогда будет выведено: ");
             AnsiConsole.MarkupLine("[black on red]г[/][black on yellow]р[/][black on red]у[/][black on red]ш[/][black on green]а[/]");
+            Console.WriteLine("Также внизу программы есть виртуальная клавиатура, на которой каждая буква также подсвечивается.");
+            Console.WriteLine("Нажмите любую клавишу, чтобы продолжить...");
             Console.ReadKey(true);
         }
-        Console.WriteLine("Начнем игру...");
         string hiddenWord = words[Random.Shared.Next(0, words.Length - 1)];
         Console.Clear();
         byte[] kboard = new byte[32];
