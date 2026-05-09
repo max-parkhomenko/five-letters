@@ -28,10 +28,10 @@ jobs:
 
     - name: Publish
       run: |
-        dotnet publish \
-          -c Release \
-          -r ${{ matrix.runtime }} \
-          --self-contained true \
+        dotnet publish `
+          -c Release `
+          -r ${{ matrix.runtime }} `
+          --self-contained true `
           -o publish/${{ matrix.runtime }}
 
     - name: Rename executable
