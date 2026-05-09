@@ -151,6 +151,7 @@ public class Program
         Console.WriteLine("Начнем игру...");
         string hiddenWord = words[Random.Shared.Next(0, words.Length - 1)];
         Console.Clear();
+        byte[] kboard = new byte[32];
         for (int i = 0; i < 6; i++)
         {
             thisTry:
@@ -176,11 +177,13 @@ public class Program
             List<char> alreadyUsedChars = [];
             foreach (char c in word)
             {
+                int iChar = GetKeyboardID(c);
                 int cIndex = word.IndexOf(c);
                 if (hiddenWord[cIndex] == c && !alreadyUsedChars.Contains(c))
                 {
                     AnsiConsole.Markup("[black on green]{0}[/]", c);
                     alreadyUsedChars.Add(c);
+                    kboard[iChar] = 1;
                 }
                 else if (hiddenWord.Contains(c))
                 {
@@ -189,9 +192,11 @@ public class Program
                         if (alreadyUsedChars.Contains(c))
                         {
                             AnsiConsole.Markup("[black on red]{0}[/]", c);
+                            kboard[iChar] = 3;
                         }
                         else {
                             AnsiConsole.Markup("[black on yellow]{0}[/]", c);
+                            kboard[iChar] = 2;
                         }
                         if (--not_single_chars[c] == 0)
                         {
@@ -202,9 +207,11 @@ public class Program
                     if (alreadyUsedChars.Contains(c))
                     {
                         AnsiConsole.Markup("[black on red]{0}[/]", c);
+                        kboard[iChar] = 3;
                     }
                     else {
                         AnsiConsole.Markup("[black on yellow]{0}[/]", c);
+                        kboard[iChar] = 2;
                     }
                     int counts = hiddenWord.Count(ch => ch == c);
                     if (counts > 1)
@@ -215,16 +222,103 @@ public class Program
                 else
                 {
                     AnsiConsole.Markup("[black on red]{0}[/]", c);
+                    kboard[iChar] = 3;
                 }
             }
             Console.WriteLine();
+            DisplayVirtualKeyboard(kboard);
             if (hiddenWord == word)
             {
                 Console.WriteLine("Поздравляю с победой! Перезапустите игру, чтобы сыграть ещё!");
+                RemoveVirtualKeyboard();
                 return;
             }
         }
         Console.WriteLine("К сожалению, вы проиграли. Загаданное слово было: {0}", hiddenWord);
         Console.WriteLine("Перезапустите программу чтобы сыграть ещё!");
+        RemoveVirtualKeyboard();
+    }
+
+    private static void DisplayVirtualKeyboard(byte[] keyboardParameters) // 32 params
+    {
+        (int left, int top) = Console.GetCursorPosition();
+        (int newLeft, int newTop) = (left, Console.WindowHeight - 5);
+        Console.SetCursorPosition(newLeft, newTop);
+
+        byte row = 0;
+        int currentKeyInRow = 0;
+        char[][] kboard = [
+            ['й', 'ц', 'у', 'к', 'е', 'н', 'г', 'ш', 'щ', 'з', 'х', 'ъ'],
+            ['ф', 'ы', 'в', 'а', 'п', 'р', 'о', 'л', 'д', 'ж', 'э'],
+            ['я', 'ч', 'с', 'м', 'и', 'т', 'ь', 'б', 'ю']
+        ];
+        for (int i = 0; i < 32; i++)
+        {
+            if (i < 12)
+            {
+                row = 0;
+                currentKeyInRow = i;
+            }
+            else if (i < 23)
+            {
+                if (i == 12)
+                {
+                    Console.WriteLine();
+                    Console.WriteLine();
+                }
+                row = 1;
+                currentKeyInRow = i - 12;
+            }
+            else
+            {
+                if (i == 23)
+                {
+                    Console.WriteLine();
+                    Console.WriteLine();
+                }
+                row = 2;
+                currentKeyInRow = i - 23;
+            }
+            char key = kboard[row][currentKeyInRow];
+            byte color = keyboardParameters[i];
+
+            if (color == 0)
+            {
+                Console.Write("{0}  ", key);
+            }
+            if (color == 1)
+            {
+                AnsiConsole.Markup("[black on green]{0}[/]  ", key);
+            }
+            if (color == 2)
+            {
+                AnsiConsole.Markup("[black on yellow]{0}[/]  ", key);
+            }
+            if (color == 3)
+            {
+                AnsiConsole.Markup("[black on red]{0}[/]  ", key);
+            }
+        }
+
+        Console.SetCursorPosition(left, top);
+    }
+
+    public static void RemoveVirtualKeyboard()
+    {
+        (int left, int top) = Console.GetCursorPosition();
+        (int newLeft, int newTop) = (left, Console.WindowHeight - 5);
+        Console.SetCursorPosition(newLeft, newTop);
+
+        Console.WriteLine("                                                            \n");
+        Console.WriteLine("                                                            \n");
+        Console.WriteLine("                                                            \n");
+        
+        Console.SetCursorPosition(left, top);
+    }
+
+    private static int GetKeyboardID(char ch)
+    {
+        string alphabet = "йцукенгшщзхъфывапролджэячсмитьбю";
+        return alphabet.IndexOf(ch);        
     }
 }
