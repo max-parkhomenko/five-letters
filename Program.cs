@@ -151,8 +151,8 @@ public class Program
             Console.ReadKey(true);
         }
         string hiddenWord = words[Random.Shared.Next(0, words.Length - 1)];
+        bool win = false;
         Console.Clear();
-        hiddenWord = "халат";
         byte[] kboard = new byte[32];
         for (int i = 0; i < 6; i++)
         {
@@ -210,14 +210,23 @@ public class Program
             DisplayVirtualKeyboard(kboard);
             if (hiddenWord == word)
             {
-                Console.WriteLine("Поздравляю с победой! Перезапустите игру, чтобы сыграть ещё!");
-                RemoveVirtualKeyboard();
-                return;
+                win = true;
             }
         }
-        Console.WriteLine("К сожалению, вы проиграли. Загаданное слово было: {0}", hiddenWord);
-        Console.WriteLine("Перезапустите программу чтобы сыграть ещё!");
+
+        if (win)
+        {
+            Console.WriteLine("Поздравляю с победой! Перезапустите игру, чтобы сыграть ещё!");
+        }
+        else
+        {
+            Console.WriteLine("К сожалению, вы проиграли. Загаданное слово было: {0}", hiddenWord);
+            Console.WriteLine("Перезапустите программу чтобы сыграть ещё!");
+        }
+
         RemoveVirtualKeyboard();
+        Console.Write("Нажмите любую клавишу для выхода...");
+        Console.ReadKey(true);
     }
 
     private static void DisplayVirtualKeyboard(byte[] keyboardParameters) // 32 params
