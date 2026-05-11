@@ -153,7 +153,9 @@ public class Program
         string hiddenWord = words[Random.Shared.Next(0, words.Length - 1)];
         bool win = false;
         Console.Clear();
-        byte[] kboard = new byte[32];
+        hiddenWord = "цецль";
+        KeyColor[] kboard = new KeyColor[32];
+        
         for (int i = 0; i < 6; i++)
         {
             thisTry:
@@ -176,25 +178,28 @@ public class Program
                 goto thisTry;
             }
             List<char> alreadyYellowSingularChars = [];
+            int lastCharIndex = -1;
             foreach (char c in word)
             {
                 int iChar = GetKeyboardID(c);
-                int cIndex = word.IndexOf(c);
+                int cIndex = lastCharIndex + 1;
+                lastCharIndex = cIndex;
+                Console.WriteLine(cIndex);
                 if (hiddenWord[cIndex] == c)
                 {
                     AnsiConsole.Markup("[black on green]{0}[/]", c);
-                    kboard[iChar] = 1;
+                    kboard[iChar] = KeyColor.Green;
                 }
                 else if (hiddenWord.Contains(c))
                 {
                     if (alreadyYellowSingularChars.Contains(c))
                     {
                         AnsiConsole.Markup("[black on red]{0}[/]", c);
-                        kboard[iChar] = 3;
+                        kboard[iChar] = KeyColor.Red;
                         continue;
                     }
                     AnsiConsole.Markup("[black on yellow]{0}[/]", c);
-                    kboard[iChar] = 2;
+                    kboard[iChar] = KeyColor.Yellow;
                     if (hiddenWord.Count(ch => ch == c) == 1)
                     {
                         alreadyYellowSingularChars.Add(c);
@@ -203,7 +208,7 @@ public class Program
                 else
                 {
                     AnsiConsole.Markup("[black on red]{0}[/]", c);
-                    kboard[iChar] = 3;
+                    kboard[iChar] = KeyColor.Red;
                 }
             }
             Console.WriteLine();
@@ -211,6 +216,7 @@ public class Program
             if (hiddenWord == word)
             {
                 win = true;
+                break;
             }
         }
 
@@ -229,7 +235,7 @@ public class Program
         Console.ReadKey(true);
     }
 
-    private static void DisplayVirtualKeyboard(byte[] keyboardParameters) // 32 params
+    private static void DisplayVirtualKeyboard(KeyColor[] keyboardParameters) // 32 params
     {
         (int left, int top) = Console.GetCursorPosition();
         (int newLeft, int newTop) = (left, Console.WindowHeight - 5);
@@ -270,21 +276,21 @@ public class Program
                 currentKeyInRow = i - 23;
             }
             char key = kboard[row][currentKeyInRow];
-            byte color = keyboardParameters[i];
+            KeyColor color = keyboardParameters[i];
 
-            if (color == 0)
+            if (color == KeyColor.White)
             {
                 Console.Write("{0}  ", key);
             }
-            if (color == 1)
+            if (color == KeyColor.Green)
             {
                 AnsiConsole.Markup("[black on green]{0}[/]  ", key);
             }
-            if (color == 2)
+            if (color == KeyColor.Yellow)
             {
                 AnsiConsole.Markup("[black on yellow]{0}[/]  ", key);
             }
-            if (color == 3)
+            if (color == KeyColor.Red)
             {
                 AnsiConsole.Markup("[black on red]{0}[/]  ", key);
             }
