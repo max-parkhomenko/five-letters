@@ -194,11 +194,13 @@ public class Program
                         if (alreadyYellowSingularChars.Contains(c) || charCount[c] == 1)
                         {
                             AnsiConsole.Markup("[black on red]{0}[/]", c);
-                            kboard[iChar] = KeyColor.Red;
+                            if (kboard[iChar] !=  KeyColor.Green)
+                                kboard[iChar] = KeyColor.Red;
                             continue;
                         }
                         AnsiConsole.Markup("[black on yellow]{0}[/]", c);
-                        kboard[iChar] = KeyColor.Yellow;
+                        if (kboard[iChar] !=  KeyColor.Green)
+                            kboard[iChar] = KeyColor.Yellow;
                         if (hiddenWord.Count(ch => ch == c) == 1)
                         {
                             alreadyYellowSingularChars.Add(c);
@@ -207,7 +209,8 @@ public class Program
                     else
                     {
                         AnsiConsole.Markup("[black on red]{0}[/]", c);
-                        kboard[iChar] = KeyColor.Red;
+                        if (kboard[iChar] !=  KeyColor.Green)
+                            kboard[iChar] = KeyColor.Red;
                     }
                 }
                 Console.WriteLine();
@@ -227,6 +230,7 @@ public class Program
         }
         finally
         {
+            RemoveVirtualKeyboard();
             if (win)
             {
                 Console.WriteLine("Поздравляю с победой! Перезапустите игру, чтобы сыграть ещё!");
