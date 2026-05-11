@@ -21,6 +21,7 @@ using Spectre.Console;
 
 public class Program
 {
+    private static bool displayKeyboard = true;
     public static string[] words = [
         "арбуз",
         "армия",
@@ -127,6 +128,11 @@ public class Program
     ];
     public static void Main()
     {
+        if (Console.WindowHeight < 18)
+        {
+            Console.WriteLine("Предупреждение: размер окна слишком мал, виртуальная клавиатура не будет отображена!");
+            displayKeyboard = false;
+        }
         Console.WriteLine("Добро пожаловать в игру \"Пять Букв\"!");
         Console.Write("Хотите расскажу правила? (да/нет): ");
         string? answer = Console.ReadLine();
@@ -137,6 +143,7 @@ public class Program
         }
         if (answer.Equals("да", StringComparison.OrdinalIgnoreCase))
         {
+            #region Game Rules
             Console.WriteLine("Хорошо, вот правила: ");
             Console.WriteLine("Игра загадывает слово из 5 букв, у тебя есть 6 попыток чтобы его угадать.");
             Console.WriteLine("На каждой попытке игра подсвечивает каждую букву из введенного слова определенным цветом: ");
@@ -149,6 +156,7 @@ public class Program
             Console.WriteLine("Также внизу программы есть виртуальная клавиатура, на которой каждая буква также подсвечивается.");
             Console.WriteLine("Нажмите любую клавишу, чтобы продолжить...");
             Console.ReadKey(true);
+            #endregion
         }
         string hiddenWord = words[Random.Shared.Next(0, words.Length - 1)];
         bool win = false;
@@ -161,6 +169,7 @@ public class Program
                 Console.WriteLine("\tПопытка номер {0}", i + 1);
                 Console.Write("Введите слово: ");
                 string? word = Console.ReadLine()?.ToLower();
+                #region Word Checks
                 if (word == null)
                 {
                     Console.WriteLine("Ошибка ввода-вывода!");
@@ -178,12 +187,13 @@ public class Program
                     i--;
                     continue;
                 }
+                #endregion
                 Dictionary<char, int> charCount = CountChars(word.ToCharArray(), hiddenWord);
                 List<char> alreadyYellowSingularChars = [];
                 for (int cIndex = 0; cIndex < 5; cIndex++)
                 {
                     char c = word[cIndex];
-                    int iChar = GetKeyboardID(c);
+                    int iChar = GetKeyboardId(c);
                     if (hiddenWord[cIndex] == c)
                     {
                         AnsiConsole.Markup("[black on green]{0}[/]", c);
@@ -248,6 +258,7 @@ public class Program
 
     private static void DisplayVirtualKeyboard(KeyColor[] keyboardParameters) // 32 params
     {
+        if (!displayKeyboard) return;
         (int left, int top) = Console.GetCursorPosition();
         (int newLeft, int newTop) = (left, Console.WindowHeight - 5);
         Console.SetCursorPosition(newLeft, newTop);
@@ -289,28 +300,27 @@ public class Program
             char key = kboard[row][currentKeyInRow];
             KeyColor color = keyboardParameters[i];
 
-            if (color == KeyColor.White)
+            switch (color)
             {
-                Console.Write("{0}  ", key);
-            }
-            if (color == KeyColor.Green)
-            {
-                AnsiConsole.Markup("[black on green]{0}[/]  ", key);
-            }
-            if (color == KeyColor.Yellow)
-            {
-                AnsiConsole.Markup("[black on yellow]{0}[/]  ", key);
-            }
-            if (color == KeyColor.Red)
-            {
-                AnsiConsole.Markup("[black on red]{0}[/]  ", key);
+                case KeyColor.White:
+                    Console.Write("{0}  ", key);
+                    break;
+                case KeyColor.Green:
+                    AnsiConsole.Markup("[black on green]{0}[/]  ", key);
+                    break;
+                case KeyColor.Yellow:
+                    AnsiConsole.Markup("[black on yellow]{0}[/]  ", key);
+                    break;
+                case KeyColor.Red:
+                    AnsiConsole.Markup("[black on red]{0}[/]  ", key);
+                    break;
             }
         }
 
         Console.SetCursorPosition(left, top);
     }
 
-    public static void RemoveVirtualKeyboard()
+    private static void RemoveVirtualKeyboard()
     {
         (int left, int top) = Console.GetCursorPosition();
         (int newLeft, int newTop) = (left, Console.WindowHeight - 5);
@@ -323,10 +333,10 @@ public class Program
         Console.SetCursorPosition(left, top);
     }
 
-    private static int GetKeyboardID(char ch)
+    private static int GetKeyboardId(char ch)
     {
-        string alphabet = "йцукенгшщзхъфывапролджэячсмитьбю";
-        return alphabet.IndexOf(ch);        
+        const string keyboardAlphabet = "йцукенгшщзхъфывапролджэячсмитьбю";
+        return keyboardAlphabet.IndexOf(ch);        
     }
 
     private static Dictionary<char, int> CountChars(char[] chars, string word)
