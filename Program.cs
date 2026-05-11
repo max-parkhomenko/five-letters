@@ -153,86 +153,93 @@ public class Program
         string hiddenWord = words[Random.Shared.Next(0, words.Length - 1)];
         bool win = false;
         Console.Clear();
-        hiddenWord = "цецль";
         KeyColor[] kboard = new KeyColor[32];
-        
-        for (int i = 0; i < 6; i++)
+        try
         {
-            thisTry:
-            Console.WriteLine("\tПопытка номер {0}", i + 1);
-            Console.Write("Введите слово: ");
-            string? word = Console.ReadLine()?.ToLower();
-            if (word == null)
+            for (int i = 0; i < 6; i++)
             {
-                Console.WriteLine("Ошибка ввода-вывода!");
-                return;
-            }
-            if (word.Length != 5)
-            {
-                Console.WriteLine("Требуется ввести слово из 5 букв!");
-                goto thisTry;
-            }
-            if (!Regex.IsMatch(word, @"^[а-яё]+$"))
-            {
-                Console.WriteLine("Требуется ввести русское слово, не содержащее спец. символов!");
-                goto thisTry;
-            }
-            List<char> alreadyYellowSingularChars = [];
-            int lastCharIndex = -1;
-            foreach (char c in word)
-            {
-                int iChar = GetKeyboardID(c);
-                int cIndex = lastCharIndex + 1;
-                lastCharIndex = cIndex;
-                Console.WriteLine(cIndex);
-                if (hiddenWord[cIndex] == c)
+                Console.WriteLine("\tПопытка номер {0}", i + 1);
+                Console.Write("Введите слово: ");
+                string? word = Console.ReadLine()?.ToLower();
+                if (word == null)
                 {
-                    AnsiConsole.Markup("[black on green]{0}[/]", c);
-                    kboard[iChar] = KeyColor.Green;
+                    Console.WriteLine("Ошибка ввода-вывода!");
+                    return;
                 }
-                else if (hiddenWord.Contains(c))
+                if (word.Length != 5)
                 {
-                    if (alreadyYellowSingularChars.Contains(c))
+                    Console.WriteLine("Требуется ввести слово из 5 букв!");
+                    i--;
+                    continue;
+                }
+                if (!Regex.IsMatch(word, @"^[а-яё]+$"))
+                {
+                    Console.WriteLine("Требуется ввести русское слово, не содержащее спец. символов!");
+                    i--;
+                    continue;
+                }
+                List<char> alreadyYellowSingularChars = [];
+                for (int cIndex = 0; i < 5; i++)
+                {
+                    char c = word[cIndex];
+                    int iChar = GetKeyboardID(c);
+                    Console.WriteLine(cIndex);
+                    if (hiddenWord[cIndex] == c)
+                    {
+                        AnsiConsole.Markup("[black on green]{0}[/]", c);
+                        kboard[iChar] = KeyColor.Green;
+                    }
+                    else if (hiddenWord.Contains(c))
+                    {
+                        if (alreadyYellowSingularChars.Contains(c))
+                        {
+                            AnsiConsole.Markup("[black on red]{0}[/]", c);
+                            kboard[iChar] = KeyColor.Red;
+                            continue;
+                        }
+                        AnsiConsole.Markup("[black on yellow]{0}[/]", c);
+                        kboard[iChar] = KeyColor.Yellow;
+                        if (hiddenWord.Count(ch => ch == c) == 1)
+                        {
+                            alreadyYellowSingularChars.Add(c);
+                        }
+                    }
+                    else
                     {
                         AnsiConsole.Markup("[black on red]{0}[/]", c);
                         kboard[iChar] = KeyColor.Red;
-                        continue;
-                    }
-                    AnsiConsole.Markup("[black on yellow]{0}[/]", c);
-                    kboard[iChar] = KeyColor.Yellow;
-                    if (hiddenWord.Count(ch => ch == c) == 1)
-                    {
-                        alreadyYellowSingularChars.Add(c);
                     }
                 }
-                else
+                Console.WriteLine();
+                DisplayVirtualKeyboard(kboard);
+                if (hiddenWord == word)
                 {
-                    AnsiConsole.Markup("[black on red]{0}[/]", c);
-                    kboard[iChar] = KeyColor.Red;
+                    win = true;
+                    break;
                 }
             }
-            Console.WriteLine();
-            DisplayVirtualKeyboard(kboard);
-            if (hiddenWord == word)
+
+        }
+        catch (Exception ex)
+        {
+            RemoveVirtualKeyboard();
+            Console.WriteLine("Произошла ошибка! Сообщите разработчику: {0}", ex.Message);
+        }
+        finally
+        {
+            if (win)
             {
-                win = true;
-                break;
+                Console.WriteLine("Поздравляю с победой! Перезапустите игру, чтобы сыграть ещё!");
             }
+            else
+            {
+                Console.WriteLine("К сожалению, вы проиграли. Загаданное слово было: {0}", hiddenWord);
+                Console.WriteLine("Перезапустите программу чтобы сыграть ещё!");
+            }
+            
+            Console.Write("Нажмите любую клавишу для выхода...");
+            Console.ReadKey(true);
         }
-
-        if (win)
-        {
-            Console.WriteLine("Поздравляю с победой! Перезапустите игру, чтобы сыграть ещё!");
-        }
-        else
-        {
-            Console.WriteLine("К сожалению, вы проиграли. Загаданное слово было: {0}", hiddenWord);
-            Console.WriteLine("Перезапустите программу чтобы сыграть ещё!");
-        }
-
-        RemoveVirtualKeyboard();
-        Console.Write("Нажмите любую клавишу для выхода...");
-        Console.ReadKey(true);
     }
 
     private static void DisplayVirtualKeyboard(KeyColor[] keyboardParameters) // 32 params
