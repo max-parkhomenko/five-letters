@@ -197,7 +197,7 @@ public class Program
                     if (hiddenWord[cIndex] == c)
                     {
                         AnsiConsole.Markup("[black on green]{0}[/]", c);
-                        alreadyYellowSingularChars.Add(c);
+                        alreadyYellowSingularChars.Add(c); 
                         kboard[iChar] = KeyColor.Green;
                     }
                     else if (hiddenWord.Contains(c))
@@ -205,7 +205,7 @@ public class Program
                         if (alreadyYellowSingularChars.Contains(c) && charCount[c] == 1)
                         {
                             AnsiConsole.Markup("[black on red]{0}[/]", c);
-                            if (kboard[iChar] !=  KeyColor.Green)
+                            if (kboard[iChar] != KeyColor.Green || kboard[iChar] !=  KeyColor.Yellow)
                                 kboard[iChar] = KeyColor.Red;
                             continue;
                         }
@@ -220,7 +220,7 @@ public class Program
                     else
                     {
                         AnsiConsole.Markup("[black on red]{0}[/]", c);
-                        if (kboard[iChar] !=  KeyColor.Green)
+                        if (kboard[iChar] != KeyColor.Green || kboard[iChar] !=  KeyColor.Yellow)
                             kboard[iChar] = KeyColor.Red;
                     }
                 }
