@@ -164,7 +164,7 @@ public class Program
                 if (word == null)
                 {
                     Console.WriteLine("Ошибка ввода-вывода!");
-                    return;
+                    throw new IOException("IOException: word is null");
                 }
                 if (word.Length != 5)
                 {
@@ -178,12 +178,12 @@ public class Program
                     i--;
                     continue;
                 }
+                Dictionary<char, int> charCount = CountChars(word.ToCharArray(), hiddenWord);
                 List<char> alreadyYellowSingularChars = [];
-                for (int cIndex = 0; i < 5; i++)
+                for (int cIndex = 0; cIndex < 5; cIndex++)
                 {
                     char c = word[cIndex];
                     int iChar = GetKeyboardID(c);
-                    Console.WriteLine(cIndex);
                     if (hiddenWord[cIndex] == c)
                     {
                         AnsiConsole.Markup("[black on green]{0}[/]", c);
@@ -191,7 +191,7 @@ public class Program
                     }
                     else if (hiddenWord.Contains(c))
                     {
-                        if (alreadyYellowSingularChars.Contains(c))
+                        if (alreadyYellowSingularChars.Contains(c) || charCount[c] == 1)
                         {
                             AnsiConsole.Markup("[black on red]{0}[/]", c);
                             kboard[iChar] = KeyColor.Red;
@@ -236,7 +236,7 @@ public class Program
                 Console.WriteLine("К сожалению, вы проиграли. Загаданное слово было: {0}", hiddenWord);
                 Console.WriteLine("Перезапустите программу чтобы сыграть ещё!");
             }
-            
+
             Console.Write("Нажмите любую клавишу для выхода...");
             Console.ReadKey(true);
         }
@@ -323,5 +323,20 @@ public class Program
     {
         string alphabet = "йцукенгшщзхъфывапролджэячсмитьбю";
         return alphabet.IndexOf(ch);        
+    }
+
+    private static Dictionary<char, int> CountChars(char[] chars, string word)
+    {
+        Dictionary<char, int> result = new Dictionary<char, int>();
+        chars = chars.Distinct().ToArray();
+        foreach (char ch in chars)
+        {
+            int count = word.Count(c => c == ch);
+            if (!result.TryAdd(ch, count))
+            {
+                result[ch] = count + 1;
+            }
+        }
+        return result;
     }
 }
