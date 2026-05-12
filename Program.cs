@@ -189,6 +189,7 @@ public class Program
                 }
                 #endregion
                 Dictionary<char, int> charCount = CountChars(word.ToCharArray(), hiddenWord);
+                word = word.Replace("ё", "е");
                 List<char> alreadyYellowSingularChars = [];
                 for (int cIndex = 0; cIndex < 5; cIndex++)
                 {
