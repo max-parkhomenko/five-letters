@@ -54,7 +54,7 @@ public class Program
             Console.ReadKey(true);
             #endregion
         }
-        string hiddenWord =Wordlist.words[Random.Shared.Next(0, Wordlist.words.Length - 1)];
+        string hiddenWord = Wordlist.words[Random.Shared.Next(0, Wordlist.words.Length - 1)];
         bool win = false;
         Console.Clear();
         KeyColor[] kboard = new KeyColor[32];
